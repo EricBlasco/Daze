@@ -1,0 +1,29 @@
+# Node.js dependencies
+node_modules/
+
+# Python dependencies
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# Build outputs
+build/
+dist/
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.swp
+
+# System files
+.DS_Store
+Thumbs.db
