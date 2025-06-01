@@ -40,7 +40,7 @@ async def search_songs(query: str):
             "type": "video",
             "videoCategoryId": "10",  # Categoría de música
             "key": YOUTUBE_API_KEY,
-            "maxResults": 10
+            "maxResults": 10  # Número máximo de resultados
         })
         response.raise_for_status()
         data = response.json()
