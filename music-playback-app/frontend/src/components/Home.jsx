@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import UploadSong from './UploadSong';
 import GothicAudioPlayer from './GothicAudioPlayer';
+import Search from './Search';
+import VideoPlayer from './Player';
 
 const Home = () => {
   // Guardar todas las canciones subidas
@@ -17,6 +19,9 @@ const Home = () => {
   });
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+
+  // Video actual
+  const [currentVideo, setCurrentVideo] = useState(null);
 
   // Guardar en localStorage cada vez que cambian las canciones o playlists
   useEffect(() => {
@@ -356,8 +361,14 @@ const Home = () => {
             <button onClick={handleNext} style={buttonStyle}>Siguiente</button>
           </div>
         </div>
-      )
-      }
+      )}
+
+      {/* Buscador y reproductor de video */}
+      <div style={{ marginTop: '2rem' }}>
+        <h3>Buscar y reproducir video</h3>
+        <Search onPlay={(url) => setCurrentVideo(url)} />
+        {currentVideo && <VideoPlayer videoUrl={currentVideo} />}
+      </div>
     </div>
   );
 };

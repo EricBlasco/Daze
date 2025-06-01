@@ -3,9 +3,18 @@ from typing import List
 from services.playback_service import PlaybackService
 import os
 import shutil
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()  # Carga las variables del archivo .env
+
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
+YOUTUBE_API_URL = "https://www.googleapis.com/youtube/v3/search"
 
 router = APIRouter()
 playback_service = PlaybackService()
+
+print(f"YOUTUBE_API_KEY: {YOUTUBE_API_KEY}")
 
 @router.post("/upload")
 async def upload_song(
@@ -76,3 +85,38 @@ async def previous_track():
         return {"message": "Playing previous track"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/search")
+async def search_songs(query: str):
+    try:
+        response = requests.get(YOUTUBE_API_URL, params={
+            "part": "snippet",
+            "q": query,
+            "type": "video",
+            "videoCategoryId": "10",
+            "key": YOUTUBE_API_KEY,
+            "maxResults": 10
+        })
+        response.raise_for_status()
+        data = response.json()
+
+        # Procesar los resultados
+        tracks = [
+            {
+                "id": item["id"]["videoId"],
+                "title": item["snippet"]["title"],
+                "channel": item["snippet"]["channelTitle"],
+                "thumbnail": item["snippet"]["thumbnails"]["medium"]["url"],
+                "url": f"https://www.youtube.com/watch?v={item['id']['videoId']}"
+            }
+            for item in data.get("items", [])
+        ]
+
+        return {"tracks": tracks}
+    except requests.exceptions.HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+        print(f"Response content: {response.text}")
+        raise HTTPException(status_code=response.status_code, detail="Error al comunicarse con la API de YouTube")
+    except Exception as e:
+        print(f"Error general: {e}")
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
